@@ -13,7 +13,7 @@ const userController = {
         })
     },
     getOneUser(req, res) {
-        User.findOne({ _id: req.params.id })
+        User.findOne({ _id: req.params.userId })
         .select('-__v')
         .populate('friends')
         .populate('thoughts')
@@ -40,7 +40,7 @@ const userController = {
     },
     updateUser(req, res) {
         User.findOneAndUpdate(
-            {_id: req.params.id},
+            {_id: req.params.userId},
             {$set: req.body},
             {
                 runValidators: true,
@@ -58,7 +58,7 @@ const userController = {
             })
     },
     deleteUser(req, res) {
-        User.findOneAndDelete({_id: req.params.id})
+        User.findOneAndDelete({_id: req.params.userId})
         .then(dbUserData => {
             if (!dbUserData){
                 return res.status(404).json({message : 'No user with this ID!'})
@@ -72,7 +72,7 @@ const userController = {
         })
     },
     addFriend(req, res) {
-        User.findOneAndUpdate({_id: req.params.id}, {$addToSet: { friends: req.params.friendId }}, { new: true })
+        User.findOneAndUpdate({_id: req.params.userid}, {$addToSet: { friends: req.params.friendId }}, { new: true })
         .then(dbUserData => {
             if (!dbUserData){
                 return res.status(404).json({message : 'No user with this ID!'})
@@ -85,7 +85,7 @@ const userController = {
         })
     },
     removeFriend(req, res) {
-    User.findOneAndUpdate({_id: req.params.id}, {$pull: { friends: req.params.friendId }}, { new: true }) 
+    User.findOneAndUpdate({_id: req.params.userid}, {$pull: { friends: req.params.friendId }}, { new: true }) 
     .then(dbUserData => {
         if (!dbUserData){
             return res.status(404).json({message : 'No user with this ID!'})
