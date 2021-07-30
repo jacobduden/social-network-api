@@ -12,8 +12,9 @@ const userController = {
             res.status(500).json(err)
         })
     },
+
     getOneUser(req, res) {
-        User.findOne({ _id: req.params.userId })
+        User.findOne({ _id: req.params.id })
         .select('-__v')
         .populate('friends')
         .populate('thoughts')
@@ -28,6 +29,7 @@ const userController = {
             res.status(500).json(err)
         })
     },
+
     createUser(req, res) {
         User.create(req.body)
         .then(dbUserData => {
@@ -38,9 +40,10 @@ const userController = {
             res.status(500).json(err)
         })
     },
+
     updateUser(req, res) {
         User.findOneAndUpdate(
-            {_id: req.params.userId},
+            {_id: req.params.id},
             {$set: req.body},
             {
                 runValidators: true,
@@ -58,7 +61,7 @@ const userController = {
             })
     },
     deleteUser(req, res) {
-        User.findOneAndDelete({_id: req.params.userId})
+        User.findOneAndDelete({_id: req.params.id})
         .then(dbUserData => {
             if (!dbUserData){
                 return res.status(404).json({message : 'No user with this ID!'})

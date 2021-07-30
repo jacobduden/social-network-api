@@ -2,7 +2,7 @@ const { Thought, User } = require('../models');
 
 const thoughtController = {
  getThoughts(req, res) {
-     Thought.find()
+     Thought.find({})
      .sort({ createdAt: -1 })
      .then(dbThoughtData => {
          res.json(dbThoughtData)
@@ -18,25 +18,29 @@ const thoughtController = {
      }).then(dbThoughtData => {
          if(!dbThoughtData){
              res.status(404).json({message: "No thought with that ID!"})
+             return
          }
-        res.json(dbThoughtData)
+       res.json(dbThoughtData)
     }).catch((err) => {
        console.log(err);
        res.status(500).json(err);
      });
  },
- createThought(req, res) {
-     Thought.create(req.body)
-     .then(dbThoughtData => {
+ createThought({params, body}, res) {
+     Thought.create(body)
+     .then(({_id}) => {
          return User.findOneAndUpdate(
-             {_id: req.body.userId},
-             { $push: {thoughts: dbThoughtData._id } },
+             {_id: params.userId},
+             { $push: {thoughts: _id } },
              {new: true}
          );
      }).then(dbUserData => {
          if(!dbUserData) {
              res.status(404).json({message: "the Thought was created, but there is no user with that ID!"})
          }
+     }).catch((err)=>{
+         console.log(err);
+         res.status(500).json(err)
      })
  },
  updateThought(req, res) {
@@ -68,7 +72,7 @@ const thoughtController = {
             { new: true }
         ).then(dbUserData => {
             if(!dbUserData){
-                res.status(404).json({ message: "thought was deleted, but there was no user!" })
+              return res.status(404).json({ message: "thought was deleted, but there was no user!" })
             }
             res.json({message: "The thought was successfully removed!"})
         })
@@ -86,9 +90,9 @@ const thoughtController = {
          {new: true}
      ).then(dbThoughtData => {
          if(!dbThoughtData) {
-             res.status(404).json({message: "No thought with that ID!"})
-             res.json(dbThoughtData)
+            return res.status(404).json({message: "No thought with that ID!"}) 
          }
+         res.json(dbThoughtData)
      }).catch(err =>{
          console.log(err)
          res.status(500).json(err)
@@ -102,9 +106,9 @@ const thoughtController = {
          {new: true}
      ).then(dbThoughtData => {
         if(!dbThoughtData) {
-            res.status(404).json({message: "No thought with that ID!"})
-            res.json(dbThoughtData)
+           return res.status(404).json({message: "No thought with that ID!"})    
         }
+        res.json(dbThoughtData)
     }).catch(err =>{
         console.log(err)
         res.status(500).json(err)
